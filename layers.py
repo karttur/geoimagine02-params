@@ -1,15 +1,21 @@
 '''
 Created on 21 Jan 2021
+Last updated 12 Feb 2021
 
 @author: thomasgumbricht
 '''
 
+# Standard library imports
 
-import support.karttur_dt as mj_dt
-from gis import kt_gis as ktgis
 from os import path, makedirs
 
-#from copy import deepcopy
+# Third party imports
+
+# Package application imports
+
+import geoimagine.support.karttur_dt as mj_dt
+
+from geoimagine.gis import kt_gis as ktgis
 
 class LayerCommon:
     '''
@@ -201,11 +207,11 @@ class RasterLayer(Layer):
             for key, value in kwargs.items():
                 modeD[key] = value
                 #setattr(self, key, value)
-        self.DS,self.layer = mj_gis.RasterOpenGetFirstLayer(self.FPN,modeD)
+        self.DS,self.layer = ktgis.RasterOpenGetFirstLayer(self.FPN,modeD)
         self.GetGeoFormatD()
         
     def RasterCreateWithFirstLayer(self,layer):
-        self.dstDS = mj_gis.RasterCreateWithFirstLayer(self.FPN,layer)
+        self.dstDS = ktgis.RasterCreateWithFirstLayer(self.FPN,layer)
 
             
     def GetGeoFormatD(self):
@@ -223,7 +229,7 @@ class RasterLayer(Layer):
         if kwargs is not None:
             for key, value in kwargs.items():
                 writeD[key] = value
-        mj_gis.CreateDSWriteRasterArray(self, writeD)
+        ktgis.CreateDSWriteRasterArray(self, writeD)
       
 class RegionLayer(Layer): 
     """layer class for arbitrary layers.""" 
@@ -250,11 +256,11 @@ class RegionLayer(Layer):
 
         self.FN = '%(prefix)s_%(prod)s_%(reg)s_%(d)s%(suf)s%(e)s' %{'prefix':self.comp.prefix,'prod':self.comp.product,'reg':self.location.regionid, 'd':self.datum.acqdatestr, 'suf':self.comp.suffix,'e':self.comp.ext}            
         if self.movieframe:
-            self.FP = os.path.join(self.comp.mainpath, self.comp.source, self.comp.division, self.comp.folder, self.location.regionid)
+            self.FP = path.join(self.comp.mainpath, self.comp.source, self.comp.division, self.comp.folder, self.location.regionid)
         else:
-            self.FP = os.path.join(self.comp.mainpath, self.comp.source, self.comp.division, self.comp.folder, self.location.regionid, self.datum.acqdatestr)
+            self.FP = path.join(self.comp.mainpath, self.comp.source, self.comp.division, self.comp.folder, self.location.regionid, self.datum.acqdatestr)
 
-        self.FPN = os.path.join(self.FP,self.FN)
+        self.FPN = path.join(self.FP,self.FN)
         if ' ' in self.FPN:
             exitstr = 'EXITING region FPN contains space %s' %(self.FPN)
             exit(exitstr)
