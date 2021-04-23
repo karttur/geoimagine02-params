@@ -6,8 +6,8 @@ Created on 19 Jan 2021
 
 from sys import exit
 import os
-import support.karttur_dt as mj_dt
-from ktpandas import PandasTS
+import geoimagine.support.karttur_dt as mj_dt
+from geoimagine.ktpandas import PandasTS
      
 class TimeSteps:
     """Sets the time span, seasonality and timestep to process data for.

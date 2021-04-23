@@ -13,6 +13,6 @@ Thomas Gumbricht (thomas.gumbricht@karttur.com)
 
 """
 from .version import __version__, VERSION, metadataD
-from params.paramsjson import JsonParams, Struct, Composition
+from geoimagine.params.paramsjson import JsonParams, Struct, Composition, Location
 from .timestep import TimeSteps
-from .layers import VectorLayer, RasterLayer, RegionLayer, LayerCommon
+from .layers import VectorLayer, RasterLayer, RegionLayer, LayerCommon, Layer

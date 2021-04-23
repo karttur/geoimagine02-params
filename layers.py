@@ -102,27 +102,7 @@ class Layer(LayerCommon):
         self.path = lambda: None
         
         self.path.volume = self.comp.volume
-        
-        '''
-        if self.comp.ext[0] == '.':
-        
-            self.path.hdr = self.path.ext = self.comp.ext
-        
-        else:
-        
-            self.path.hdr = self.path.ext ='.%s' %(self.comp.ext)
-        
-        if hasattr(filepath, 'dat') and len(filepath.dat) >= 2:
-        
-            if filepath.dat[0] == '.':
-            
-                self.path.dat = filepath.dat
-            
-            else:
-            
-                self.path.dat = '.%s' %(filepath.dat)
-        '''
-        
+                
         self._SetPath()
      
     def _SetPath(self):
@@ -135,6 +115,7 @@ class Layer(LayerCommon):
         if ' ' in self.FPN:
             exitstr = 'EXITING region FPN contains space %s' %(self.FPN)
             exit(exitstr)
+                    
                   
 class VectorLayer(Layer):
     def __init__(self, comp, locusD, datumD): 
@@ -207,14 +188,28 @@ class RasterLayer(Layer):
             for key, value in kwargs.items():
                 modeD[key] = value
                 #setattr(self, key, value)
-        self.DS,self.layer = ktgis.RasterOpenGetFirstLayer(self.FPN,modeD)
+        
+        self.DS, self.layer = ktgis.RasterOpenGetFirstLayer(self.FPN,modeD)
+        
         self.GetGeoFormatD()
         
-    def RasterCreateWithFirstLayer(self,layer):
-        self.dstDS = ktgis.RasterCreateWithFirstLayer(self.FPN,layer)
-
-            
+    def EmptyLayer(self):
+        
+        self.layer = lambda:None
+        
+    def RasterCreateWithFirstLayer(self):
+        '''
+        '''
+        dstDS = ktgis.RasterCreateWithFirstLayer(self.FPN, self)
+        
+        dstDS._WriteFullArray(self)
+        
+        # close
+        dstDS = None
+         
     def GetGeoFormatD(self):
+        '''
+        '''
         self.geoFormatD = {'lins':self.layer.lins,'cols':self.layer.cols,'projection':self.layer.projection,'geotrans':self.layer.geotrans,'cellsize':self.layer.cellsize}
         
     def SetGeoFormat(self,geoFormatD):
@@ -229,8 +224,33 @@ class RasterLayer(Layer):
         if kwargs is not None:
             for key, value in kwargs.items():
                 writeD[key] = value
+        CreateGDALraster
         ktgis.CreateDSWriteRasterArray(self, writeD)
       
+    def _RetrieveLayerComp(self,session):
+        '''  
+        '''
+        
+        # Set the search to content´ and layerid
+        searchItemL = ['content','layerid','product']
+        
+        queryD = {'content':self.comp.content, 'layerid':self.comp.layerid, 'product':self.comp.product}
+        
+        return session._RetrieveLayerComp(queryD, searchItemL )
+    
+    def CopyGeoformatFromSrcLayer(self,otherLayer):
+        '''Direct copy of geoformat from srcLayer to dstLayer
+        '''
+        if not hasattr(self,'layer'):
+            
+            self.layer = lambda:None
+            
+        itemL = ['lins','cols','projection','geotrans','cellsize']
+        
+        for item in itemL:
+            
+            setattr(self.layer, item, getattr(otherLayer,item))
+                 
 class RegionLayer(Layer): 
     """layer class for arbitrary layers.""" 
     def __init__(self,comp, location, datum, movieframe = False): 
